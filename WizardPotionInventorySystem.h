@@ -56,6 +56,8 @@ WizardPotionInventorySystem& operator= (const WizardPotionInventorySystem& copy)
      
     int capacity;
 
+    int realSize;
+
     //should check whether there are another student name with given name
     bool checkStudentName(const string name, int& index)const;
 

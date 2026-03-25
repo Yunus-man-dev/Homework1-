@@ -6,6 +6,7 @@ using namespace std;
  WizardPotionInventorySystem::WizardPotionInventorySystem (){
     students = nullptr;
     capacity = 0;
+    realSize = 0;
  }
 
 WizardPotionInventorySystem& WizardPotionInventorySystem::operator=(WizardPotionInventorySystem& assignment){
@@ -13,17 +14,17 @@ WizardPotionInventorySystem& WizardPotionInventorySystem::operator=(WizardPotion
         return *this;
     }
     Student** stus = nullptr;
-    if(assignment.capacity != 0){
+    if(assignment.realSize!= 0){
         // yeni bir student** olustur, assignmenti kopyala
-        stus = new Student*[assignment.capacity];
-        for(int i = 0; i<assignment.capacity; i++){
+        stus = new Student*[assignment.realSize];
+        for(int i = 0; i<assignment.realSize; i++){
 
             stus[i] = new Student(*(assignment.students[i]));
 
         }
     }
     // deletion of existing data
-    for(int i = 0; i < capacity; i++){
+    for(int i = 0; i < realSize; i++){
         delete students[i];
 
     }
@@ -36,7 +37,7 @@ WizardPotionInventorySystem& WizardPotionInventorySystem::operator=(WizardPotion
 }
 
  WizardPotionInventorySystem::~WizardPotionInventorySystem (){
-     for (int i = 0; i < capacity; i++) {
+     for (int i = 0; i < realSize; i++) {
                 delete students[i]; // Önce ogrencileri Heap'ten sil
             }
 
@@ -47,10 +48,10 @@ WizardPotionInventorySystem& WizardPotionInventorySystem::operator=(WizardPotion
 
     
 
-    if(copy.capacity != 0){
+    if(copy.realSize != 0){
 
-        students = new Student*[copy.capacity];
-        for(int i = 0; i<copy.capacity; i++){
+        students = new Student*[copy.realSize];
+        for(int i = 0; i<copy.realSize; i++){
             
             students[i] = new Student( *(copy.students[i]));
 
@@ -62,6 +63,7 @@ WizardPotionInventorySystem& WizardPotionInventorySystem::operator=(WizardPotion
         students = nullptr;
     }
     capacity = copy.capacity;
+    realSize = copy.realSize;
 
  }
 
@@ -98,7 +100,7 @@ bool WizardPotionInventorySystem::checkStudentName(const string name, int& index
             
             bool found = false;
 
-            for(int i = 0; i<capacity; i++){
+            for(int i = 0; i<realSize; i++){
                 if(students[i]->getName() == name){
                     found = true;
                     index = i;
@@ -188,7 +190,17 @@ void WizardPotionInventorySystem::addStudentWizard ( const std::string name , co
     }
     // eger oyle bir ogrenci yoksa
     else{
-       increaseArr(name,house);
+        if(realSize == capacity){
+             increaseArr(name,house);
+        }
+        // eger henuz capacitye ulasmadiysak
+        else{
+            Student* add = new Student(name, house);
+            students[realSize] = add;
+            realSize++;
+        }
+      
+       
         // cout<<"Added student wizard "<<name<<"."<<endl;
     }
 
@@ -233,7 +245,7 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
 
     
             
-            Student** temp =new Student*[capacity+1];
+            Student** temp =new Student*[2*capacity];
             Student* added = new Student(studentName,house);
            
 
@@ -245,15 +257,18 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
 
                 temp[capacity] = added;
                 delete[] students;
+                capacity = 2* capacity;
+                realSize++;
                 
             }
             else{
                 
                 temp[0] = added;
-
+                capacity = 1;
+                realSize = 1;
             }
             students = temp;
-            capacity++;
+           
         
        
  }
@@ -262,40 +277,55 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
  void WizardPotionInventorySystem::decreaseArr(std::string studentName, const int index){
 
 
-    if( capacity == 1){
-        delete students[0];
-        delete[] students;
-        students = nullptr;
-        capacity--;
-    }
-    else{
-        Student** tempt = new Student*[capacity-1];
+    // if( realSize == 1){
+    //     delete students[0];
+    //     delete[] students;
+    //     students = nullptr;
+    //     capacity--;
+    // }
+    // else{
+
+        // delete the index
+        delete students[index];
+
+        // swap it with the last one
+        
+        
+        students[index] = students[realSize-1];
+        students[realSize-1] = nullptr;
+
+        // realSize--;
+        realSize--;
 
 
-        // indexe kadar olan yer icin
-        for(int i = 0; i<index; i++){
-            tempt[i] = students[i];
+
+        // Student** tempt = new Student*[capacity-1];
+
+        
+        // // indexe kadar olan yer icin
+        // for(int i = 0; i<index; i++){
+        //     tempt[i] = students[i];
                 
     
-        }   
+        // }   
                 
-        // ardindan yeni bir for, bu sefer index+1 den baslayip size e kadar git
+        // // ardindan yeni bir for, bu sefer index+1 den baslayip size e kadar git
                 
-        for(int i = index+1; i<capacity; i++){
+        // for(int i = index+1; i<capacity; i++){
                     
-            tempt[i-1] =students[i];
+        //     tempt[i-1] =students[i];
                 
-        }
+        // }
                 
-        delete students[index];
+        // delete students[index];
                 
-        delete[] students;
+        // delete[] students;
                 
                 
-        students = tempt;
+        // students = tempt;
             
-        capacity--;
-    }
+        // capacity--;
+    // }
     
 
  }
@@ -304,7 +334,7 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
 // SHOW FUNCTIONS
  void WizardPotionInventorySystem::showAllStudentWizards()const{
     cout<<"Student wizards in the system:"<<endl;
-    if(capacity == 0){
+    if(realSize == 0){
         cout<<"None"<<endl;
     }
     else{
@@ -338,7 +368,7 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
         // ne lazim?
         // Harry , House : Gryffindor , 1 potion (s), 6 total strength .
        
-        for(int i =0; i<capacity; i++){
+        for(int i =0; i<realSize; i++){
             string name = sortedStudents[i]->getName();
             string house = sortedStudents[i]->getHouse();
             int potionNumb = sortedStudents[i]->getSize();
@@ -394,7 +424,7 @@ void WizardPotionInventorySystem::showPotion ( const std::string potionName ) co
     int a =0;
     int& b = a;
     int count = 0;
-    for(int i = 0; i<capacity; i++){
+    for(int i = 0; i<realSize; i++){
         if(students[i]->checkPotion(potionName,b)){
             count++;
         }
@@ -411,7 +441,7 @@ void WizardPotionInventorySystem::showPotion ( const std::string potionName ) co
         int holder = 0;
 
         // tekrar kac tane studentin o potionun oldugunu bul, ama bu sefer bu arraye ekle
-        for(int i = 0; i<capacity; i++){
+        for(int i = 0; i<realSize; i++){
             if(students[i]->checkPotion(potionName,b)){
             stu[holder] = students[i];
             holder++;
