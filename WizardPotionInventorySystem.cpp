@@ -339,30 +339,29 @@ void WizardPotionInventorySystem::increaseArr(const std::string studentName, con
     }
     else{
         //burda isimleri alphabetic olarak yazman lazim, ama simdilik normal yazalim calisiyor m
-        // for(int i =0; i<capacity; i++){
-        //     cout<<i<<". "<<students[i]<<endl;
-        // }
-        Student** sortedStudents = new Student*[capacity];
-        for (int i = 0; i < capacity; i++) {
+        
+        Student** sortedStudents = new Student*[realSize];
+        for (int i = 0; i < realSize; i++) {
             sortedStudents[i] = students[i];
         }
 
-        // 2. Selection Sort Algoritması
-        for (int i = 0; i < capacity - 1; i++) {
-            int minIdx = i;
-            for (int j = i + 1; j < capacity; j++) {
-                // String karşılaştırması: Alfabetik olarak daha önce mi?
-                if (sortedStudents[j]->getName() < sortedStudents[minIdx]->getName()) {
-                    minIdx = j;
-                }
-             }
+        // // 2. Selection Sort Algoritması
+        // for (int i = 0; i < capacity - 1; i++) {
+        //     int minIdx = i;
+        //     for (int j = i + 1; j < capacity; j++) {
+        //         // String karşılaştırması: Alfabetik olarak daha önce mi?
+        //         if (sortedStudents[j]->getName() < sortedStudents[minIdx]->getName()) {
+        //             minIdx = j;
+        //         }
+        //      }
 
-            // Pointer'ların yerini değiştir (Swap)
-            Student* temp = sortedStudents[i];
-            sortedStudents[i] = sortedStudents[minIdx];
-            sortedStudents[minIdx] = temp;
-        }   
+        //     // Pointer'ların yerini değiştir (Swap)
+        //     Student* temp = sortedStudents[i];
+        //     sortedStudents[i] = sortedStudents[minIdx];
+        //     sortedStudents[minIdx] = temp;
+        // }   
         
+        mergeSort(0,realSize-1,sortedStudents);
         // Yazdirma
 
         // ne lazim?
@@ -487,4 +486,93 @@ void WizardPotionInventorySystem::showPotion ( const std::string potionName ) co
 
 }
 
+void WizardPotionInventorySystem::mergeSort(int first, int last,Student** student)const{
 
+    if(first == last ){
+        return;
+    }
+   
+    // divide
+    int divide = (first +last)/2;
+    mergeSort(first,divide,student);
+    mergeSort(divide+1,last,student);
+    // divide the parts by half
+
+    //conquer
+
+    // sort each half//
+
+    //combine
+
+    // combine the sorted two parts of the array, and return
+    merge(first,divide,last,student);
+    return;
+
+
+}
+void WizardPotionInventorySystem::merge(int first, int divide, int last, Student** student)const{
+
+    // first array
+    int size1 = divide-first+1;//3
+    Student** fir = new Student* [size1];
+    
+    for(int i = 0; i<size1; i++){
+        fir[i] = student[i+first];
+
+    }
+
+    // second array
+    int size2 = last-divide;
+    Student** ls = new Student* [size2];
+    for(int i = 0; i<size2; i++){
+        ls[i] = student[i+divide+1];
+    }
+
+    // combine
+    int indx = first;
+    int indxFirst = 0;
+    int indxSecond = 0;
+
+    while(indxFirst < size1 && indxSecond < size2){
+        if(fir[indxFirst]->getName() < ls[indxSecond]->getName()){
+            student[indx]  = fir[indxFirst];
+            indx++;
+            indxFirst++;
+        }
+       
+        else{
+            student[indx]  = ls[indxSecond];
+            indx++;
+            indxSecond++;
+        }
+
+
+    }
+    if(indxFirst == size1){
+        //first array finished first
+        while(indxSecond < size2){
+             student[indx]  = ls[indxSecond];
+            indx++;
+            indxSecond++;
+        }
+    }
+    else{
+        while(indxFirst < size1){
+
+            student[indx]  = fir[indxFirst];
+            indx++;
+            indxFirst++;
+
+        }
+       
+    }
+    
+    delete [] fir;
+    delete [] ls;
+
+
+
+
+
+
+}

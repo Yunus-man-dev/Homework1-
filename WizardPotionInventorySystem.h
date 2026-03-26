@@ -65,5 +65,8 @@ WizardPotionInventorySystem& operator= (const WizardPotionInventorySystem& copy)
 
     void decreaseArr(std::string studentName, const int index);
 
+    void mergeSort(int first, int last,Student** student) const;
+
+    void merge(int first, int divide, int last,Student** student) const;
  };
  #endif
